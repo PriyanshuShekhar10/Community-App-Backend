@@ -4,9 +4,10 @@ const UserSchema = new mongoose.Schema({
   name: String,
   email: String,
   role: String,
-  ImageUrl: String,
-  Github: String,
-  LinkedIn: String,
+  imageUrl: String,
+  github: String,
+  linkedIn: String,
+  usingDevice: mongoose.SchemaTypes.ObjectId,
 });
 
-module.exports = mongoose.model("User", UserSchema);
+module.exports = mongoose.model("user", UserSchema);

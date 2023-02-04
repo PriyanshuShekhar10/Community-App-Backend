@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Client Data</title>
+  </head>
+  <body>
+    <h1>Please fill data in the form below:</h1>
+    <form method="POST" action="/admin/add-device">
+      <label>Name:<input type="text" name="name" required /></label>
+      <br />
+
+      <label>ImageUrl<input type="text" name="imageUrl" required /></label>
+      <br />
+      <label>Desk<input type="number" name="desk" required /></label>
+      <br />
+      <label>description<br /><textarea name="description"></textarea></label>
+      <br />
+      <input type="submit" value="Submit" />
+    </form>
+    <a href="/admin/devices">View Devices</a>
+  </body>
+</html>

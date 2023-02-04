@@ -1,0 +1,17 @@
+<html>
+  <head>
+    <title>Checklist</title>
+  </head>
+  <body>
+    <form action="/checklist" method="post">
+      <% for (let device of devices) { %>
+      <div>
+        <input type="checkbox" id="<%= device.name %>" name="<%= device.name %>"
+        <%= device.present ? 'checked' : '' %>>
+        <label for="<%= device.name %>"><%= device.name %></label>
+      </div>
+      <% } %>
+      <button type="submit">Submit</button>
+    </form>
+  </body>
+</html>
