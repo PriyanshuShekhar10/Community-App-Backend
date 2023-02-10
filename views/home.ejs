@@ -6,6 +6,66 @@
     <title></title>
   </head>
   <body>
+    <table style="border: 1px solid; font-size: large">
+      <tr style="border: 1px solid">
+        <th style="border: 1px solid"></td>
+        <th style="border: 1px solid">Key 1</td>
+        <th style="border: 1px solid">Key 2</td>
+      </tr>
+      <tr style="border: 1px solid">
+        <td style="border: 1px solid">Key Holders</td>
+        <td style="border: 1px solid"><%= key1.name %></td>
+        <td style="border: 1px solid"><%= key2.name %></td>
+      </tr>
+
+      
+    </table>
+    <br /><br /><br />
+
+
+    <% if (currentUser.hasKey1) { %> 
+      <hr>
+      <div>
+        <form action="/pass-key1" method="post">
+            <h3>You have Key 1</h1>
+              <label for="a">Pass on the key</label>
+              <select id="a" name="a">
+                <% for (let x of users) { %>
+                  <option value="<%= x.email %>"><%= x.name %></option>
+                  
+                  <% } %>
+                  
+              </select> 
+              <button type="submit">Pass</button>
+        </form>
+      </div>
+      <hr>
+      <% } %>
+
+    <br /><br /><br />
+
+
+    <% if (currentUser.hasKey2) { %> 
+      <hr>
+      <div>
+        <form action="/pass-key2" method="post">
+            <h3>You have Key 2</h1>
+              <label for="a">Pass on the key</label>
+              <select id="a" name="a">
+                <% for (let x of users) { %>
+                  <option value="<%= x.email %>"><%= x.name %></option>
+                  
+                  <% } %>
+                  
+              </select> 
+              <button type="submit">Pass</button>
+        </form>
+      </div>
+      <hr>
+      <% } %>
+
+    <br /><br /><br />
+
     <form action="/enter-the-lab" method="post">
       <button type="submit">Enter the lab</button>
     </form>

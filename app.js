@@ -85,28 +85,29 @@ app.get("/checklist", checkAuthenticated, async (req, res) => {
   res.render(path.join(__dirname, "/views/checklist"), { devices });
 });
 
-// app.post("/checklist", checkAuthenticated, async (req, res, next) => {
-//   const deviceNames = Object.keys(req.body);
-//   const devices = await Device.find({});
-//   for (let device of devices) {
-//     device.present = deviceNames.includes(device.name);
-//     await device.save();
-//   }
-
-//   try {
-//     const user = await User.findOne({ email: req.user.email });
-//     if (!user) return res.status(404).send({ error: "User not found" });
-
-//     user.inLab = true;
-//     await user.save();
-
-//     res.send({ message: "Lab entry recorded" });
-//   } catch (error) {
-//     res.status(500).send({ error: error.message });
-//   }
-// });
-
 app.post("/checklist", checkAuthenticated, async (req, res, next) => {
+  const deviceNames = Object.keys(req.body);
+  const devices = await Device.find({});
+  for (let device of devices) {
+    device.present = deviceNames.includes(device.name);
+    await device.save();
+  }
+  const user = await User.findOne({ email: req.user.email });
+
+  user.inLab = true;
+  await user.save();
+  console.log({ message: "Lab entry recorded" });
+  // await execute();
+  res.redirect("/home");
+});
+
+//checklist for exit
+
+app.get("/checklist-exit", checkAuthenticated, async (req, res) => {
+  const devices = await Device.find({});
+  res.render(path.join(__dirname, "/views/checklist-exit"), { devices });
+});
+app.post("/checklist-exit", checkAuthenticated, async (req, res, next) => {
   const deviceNames = Object.keys(req.body);
   const devices = await Device.find({});
   for (let device of devices) {
@@ -117,9 +118,9 @@ app.post("/checklist", checkAuthenticated, async (req, res, next) => {
 
   user.inLab = false;
   await user.save();
-  res.send({ message: "Lab entry recorded" });
+  console.log({ message: "Lab exit recorded" });
   // await execute();
-  // res.redirect("/home");
+  res.redirect("/home");
 });
 
 //login page
@@ -172,8 +173,41 @@ app.get("/users", checkAuthenticated, async (req, res, next) => {
 
 //home
 
-app.get("/home", (req, res, next) => {
-  res.render(path.join(__dirname, "views", "home"), { users: users });
+app.get("/home", checkAuthenticated, async (req, res, next) => {
+  const currentUser = await User.findOne({ email: req.user.email });
+  const key1 = await User.findOne({ hasKey1: true });
+  const key2 = await User.findOne({ hasKey2: true });
+
+  res.render(path.join(__dirname, "views", "home"), {
+    users: users,
+    key1: key1,
+    key2: key2,
+    currentUser: currentUser,
+  });
+});
+
+app.post("/pass-key1", async (req, res, next) => {
+  const newUser = await User.findOne({ email: req.body.a });
+
+  const user = await User.findOne({ email: req.user.email });
+
+  newUser.hasKey1 = true;
+  await newUser.save();
+  user.hasKey1 = false;
+  await user.save();
+  res.redirect("/home");
+});
+
+app.post("/pass-key2", async (req, res, next) => {
+  const newUser = await User.findOne({ email: req.body.a });
+
+  const user = await User.findOne({ email: req.user.email });
+
+  newUser.hasKey2 = true;
+  await newUser.save();
+  user.hasKey2 = false;
+  await user.save();
+  res.redirect("/home");
 });
 
 app.get("/profile", (req, res, next) => {
@@ -181,8 +215,6 @@ app.get("/profile", (req, res, next) => {
 });
 
 //in lab feature
-
-app.get("/lab", checkAuthenticated, (req, res, next) => {});
 
 app.post(
   "/enter-the-lab",
@@ -203,19 +235,24 @@ app.post(
   }
 );
 
-app.post("/exit-the-lab", checkAuthenticated, async (req, res, next) => {
-  try {
-    const user = await User.findOne({ email: req.user.email });
-    if (!user) return res.status(404).send({ error: "User not found" });
+app.post(
+  "/exit-the-lab",
+  checkAuthenticated,
+  isLast,
+  async (req, res, next) => {
+    try {
+      const user = await User.findOne({ email: req.user.email });
+      if (!user) return res.status(404).send({ error: "User not found" });
 
-    user.inLab = false;
-    await user.save();
+      user.inLab = false;
+      await user.save();
 
-    res.send({ message: "Lab exit recorded" });
-  } catch (error) {
-    res.status(500).send({ error: error.message });
+      res.send({ message: "Lab exit recorded" });
+    } catch (error) {
+      res.status(500).send({ error: error.message });
+    }
   }
-});
+);
 
 app.get("/view-the-lab", checkAuthenticated, async (req, res, next) => {
   const activeUsers = await User.find({ inLab: true });
@@ -224,20 +261,6 @@ app.get("/view-the-lab", checkAuthenticated, async (req, res, next) => {
 });
 
 //controllers
-
-async function updateActiveStatus(req, res, next) {
-  try {
-    const user = await User.findOne({ email: req.user.email });
-    if (!user) return res.status(404).send({ error: "User not found" });
-
-    user.inLab = false;
-    await user.save();
-
-    res.send({ message: "Lab exit recorded" });
-  } catch (error) {
-    res.status(500).send({ error: error.message });
-  }
-}
 
 async function isFirst(req, res, next) {
   const activeUsers = await User.find({ inLab: true });
@@ -252,8 +275,7 @@ async function isFirst(req, res, next) {
 async function isLast(req, res, next) {
   const activeUsers = await User.find({ inLab: true });
   if (activeUsers.length === 1) {
-    res.redirect("/checklist");
-    // next();
+    res.redirect("/checklist-exit");
   } else {
     return next();
   }
