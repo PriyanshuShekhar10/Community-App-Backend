@@ -1,17 +1,19 @@
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title></title>
+    <title>Document</title>
   </head>
   <body>
-    <form action="/enter-the-lab" method="post">
-      <button type="submit">Enter the lab</button>
-    </form>
-    <form action="/view-the-lab" method="get">
-      <button type="submit">View the lab</button>
-    </form>
+    <h3>Current Active Users</h3>
+    <hr />
+    <% for (let x of users) { %>
+
+    <div><p><%= x.user.name %></p></div>
+    <hr />
+    <% } %>
 
     <form action="/exit-the-lab" method="post">
       <button type="submit">Exit the lab</button>
